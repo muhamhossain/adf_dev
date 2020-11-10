@@ -1,0 +1,136 @@
+{
+	"name": "CRMToCSV",
+	"properties": {
+		"activities": [
+			{
+				"name": "CRMToCSV",
+				"type": "Copy",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "DynamicsSource",
+						"query": "<fetch version=\"1.0\" output-format=\"xml-platform\" mapping=\"logical\" distinct=\"false\" >\n  <entity name=\"nicnas_registration\" alias=\"rego\" >\n    <attribute name=\"nicnas_registration_name\" />\n    <attribute name=\"statuscode\" />\n    <attribute name=\"modifiedon\" />\n    <filter type=\"and\" >\n      <condition attribute=\"modifiedon\" operator=\"last-seven-days\" />\n      <condition attribute=\"statuscode\" operator=\"in\" >\n        <value>100000002</value>\n      </condition>\n    </filter>\n    <link-entity name=\"nicnas_registrationyear\" from=\"nicnas_registrationyearid\" to=\"nicnas_registration_year\" link-type=\"inner\" alias=\"regoyr\" >\n      <attribute name=\"nicnas_year\" />\n      <filter type=\"and\" >\n        <condition attribute=\"statuscode\" operator=\"eq\" value=\"1\" />\n      </filter>\n    </link-entity>\n    <link-entity name=\"account\" from=\"accountid\" to=\"nicnas_companyid\" visible=\"false\" link-type=\"outer\" alias=\"acc\" >\n      <attribute name=\"name\" />\n    </link-entity>\n  </entity>\n</fetch>"
+					},
+					"sink": {
+						"type": "DelimitedTextSink",
+						"storeSettings": {
+							"type": "AzureBlobStorageWriteSettings"
+						},
+						"formatSettings": {
+							"type": "DelimitedTextWriteSettings",
+							"quoteAllText": true,
+							"fileExtension": ".csv"
+						}
+					},
+					"enableStaging": false,
+					"translator": {
+						"type": "TabularTranslator",
+						"mappings": [
+							{
+								"source": {
+									"name": "nicnas_registration_name",
+									"type": "String"
+								},
+								"sink": {
+									"name": "AICIS registration number",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "acc.name",
+									"type": "String"
+								},
+								"sink": {
+									"name": "Business name",
+									"type": "String"
+								}
+							}
+						]
+					}
+				},
+				"inputs": [
+					{
+						"referenceName": "RegistrationEntiry",
+						"type": "DatasetReference"
+					}
+				],
+				"outputs": [
+					{
+						"referenceName": "registration_csv_DS",
+						"type": "DatasetReference"
+					}
+				]
+			},
+			{
+				"name": "Transformation",
+				"type": "ExecuteDataFlow",
+				"dependsOn": [
+					{
+						"activity": "CRMToCSV",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"dataflow": {
+						"referenceName": "dataflow1",
+						"type": "DataFlowReference"
+					},
+					"compute": {
+						"coreCount": 8,
+						"computeType": "General"
+					}
+				}
+			},
+			{
+				"name": "CSVToJSON",
+				"type": "AzureFunctionActivity",
+				"dependsOn": [
+					{
+						"activity": "Transformation",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"functionName": "ConverCSVToJSON_Test",
+					"method": "GET"
+				},
+				"linkedServiceName": {
+					"referenceName": "AzureFunctions",
+					"type": "LinkedServiceReference"
+				}
+			}
+		],
+		"annotations": [],
+		"lastPublishTime": "2020-11-09T06:16:46Z"
+	},
+	"type": "Microsoft.DataFactory/factories/pipelines"
+}
