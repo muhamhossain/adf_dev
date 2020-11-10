@@ -1,0 +1,16 @@
+{
+	"name": "DynamicsCRMTest",
+	"type": "Microsoft.DataFactory/factories/linkedservices",
+	"properties": {
+		"annotations": [],
+		"type": "Dynamics",
+		"typeProperties": {
+			"deploymentType": "Online",
+			"serviceUri": "https://healthgovdev-aicis-dev.crm6.dynamics.com",
+			"authenticationType": "AADServicePrincipal",
+			"servicePrincipalCredentialType": "ServicePrincipalKey",
+			"servicePrincipalId": "89f0e49d-cde7-47ba-a2f5-f079eee32f44",
+			"encryptedCredential": "ew0KICAiVmVyc2lvbiI6ICIyMDE3LTExLTMwIiwNCiAgIlByb3RlY3Rpb25Nb2RlIjogIktleSIsDQogICJTZWNyZXRDb250ZW50VHlwZSI6ICJQbGFpbnRleHQiLA0KICAiQ3JlZGVudGlhbElkIjogIkFJQ0lTQURGVEVTVF8wY2Y4MmFhYS04YzFlLTQ1NjktYWNmMi1jMmFkODRiMDQxYjEiDQp9"
+		}
+	}
+}

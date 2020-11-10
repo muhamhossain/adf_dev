@@ -1,0 +1,16 @@
+{
+	"name": "RegistrationEntiry",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "DynamicsCRMTest",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "DynamicsEntity",
+		"schema": [],
+		"typeProperties": {
+			"entityName": "nicnas_registration"
+		}
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}
